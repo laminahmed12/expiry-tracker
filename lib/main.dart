@@ -56,18 +56,42 @@ class _HomeState extends State<Home> {
       Dashboard(items:items,onAdmin:adminTap),
       Inventory(items:items,onAdd:save,onDelete:remove),
       Alerts(items:items),const Settings()];
-    return Directionality(textDirection:TextDirection.rtl,child:Scaffold(
-      appBar:AppBar(title:GestureDetector(onTap:adminTap,child:const Text('ADREEMK',style:TextStyle(fontWeight:FontWeight.w900))),
-        actions:[IconButton(icon:const Icon(Icons.qr_code_scanner),onPressed:()async{
-          final v=await Navigator.push<String>(context,MaterialPageRoute(builder:(_)=>const Scanner()));
-          if(v!=null&&mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('الباركود: '+v)));
-        })]),
-      body:pages[tab],
-      bottomNavigationBar:NavigationBar(selectedIndex:tab,onDestinationSelected:(v)=>setState(()=>tab=v),destinations:const[
-        NavigationDestination(icon:Icon(Icons.dashboard_outlined),selectedIcon:Icon(Icons.dashboard),label:'الرئيسية'),
-        NavigationDestination(icon:Icon(Icons.inventory_2_outlined),selectedIcon:Icon(Icons.inventory_2),label:'المواد'),
-        NavigationDestination(icon:Icon(Icons.notifications_none),selectedIcon:Icon(Icons.notifications),label:'التنبيهات'),
-      trailing:IconButton(onPressed:onAdmin,icon:const Icon(Icons.more_horiz)))),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: GestureDetector(
+            onTap: adminTap,
+            child: const Text('ADREEMK', style: TextStyle(fontWeight: FontWeight.w900)),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.qr_code_scanner),
+              onPressed: () async {
+                final v = await Navigator.push<String>(
+                  context, MaterialPageRoute(builder: (_) => const Scanner()),
+                );
+                if (!mounted || v == null) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('الباركود: ' + v)),
+                );
+              },
+            ),
+          ],
+        ),
+        body: pages[tab],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: tab,
+          onDestinationSelected: (v) => setState(() => tab = v),
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'الرئيسية'),
+            NavigationDestination(icon: Icon(Icons.inventory_2_outlined), selectedIcon: Icon(Icons.inventory_2), label: 'المواد'),
+            NavigationDestination(icon: Icon(Icons.notifications_none), selectedIcon: Icon(Icons.notifications), label: 'التنبيهات'),
+            NavigationDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: 'الإعدادات'),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -118,20 +142,64 @@ class _InventoryState extends State<Inventory>{
  ]);}
 }
 
-class AddProduct extends StatefulWidget{const AddProduct({super.key});@override State<AddProduct> createState()=>_AddProductState();}
-class _AddProductState extends State<AddProduct>{
- final name=TextEditingController(),barcode=TextEditingController(),qty=TextEditingController(text:'1');
- DateTime expiry=DateTime.now().add(const Duration(days:30));String category='عام';
- @override Widget build(BuildContext c)=>Directionality(textDirection:TextDirection.rtl,child:Scaffold(appBar:AppBar(title:const Text('إضافة مادة')),
- body:ListView(padding:const EdgeInsets.all(18),children:[
- TextField(controller:name,decoration:const InputDecoration(labelText:'اسم المادة')),const SizedBox(height:12),
- TextField(controller:barcode,decoration:const InputDecoration(labelText:'الباركود')),const SizedBox(height:12),
- TextField(controller:qty,keyboardType:TextInputType.number,decoration:const InputDecoration(labelText:'الكمية')),const SizedBox(height:12),
- DropdownButtonFormField<String>(value:category,items:['عام','غذائي','دوائي','مواد خام','أخرى'].map((e)=>DropdownMenuItem(value:e,child:Text(e))).toList(),onChanged:(v)=>setState(()=>category=v??'عام'),decoration:const InputDecoration(labelText:'التصنيف')),
- ListTile(contentPadding:EdgeInsets.zero,title:const Text('تاريخ الانتهاء'),subtitle:Text('اضغط لاختيار التاريخ'),onTap:()async{
-  final d=await showDatePicker(context:c,initialDate:expiry,firstDate:DateTime.now(),lastDate:DateTime(2100));if(d!=null)setState(()=>expiry=d);}),
- const SizedBox(height:20),FilledButton(onPressed:()=>Navigator.pop(c,Product(id:DateTime.now().microsecondsSinceEpoch.toString(),name:name.text.trim(),barcode:barcode.text.trim(),expiry:expiry,quantity:int.tryParse(qty.text)??1,category:category)),child:const Text('حفظ المادة'))
- ]);}
+class AddProduct extends StatefulWidget {
+  const AddProduct({super.key});
+  @override State<AddProduct> createState() => _AddProductState();
+}
+class _AddProductState extends State<AddProduct> {
+  final name = TextEditingController();
+  final barcode = TextEditingController();
+  final qty = TextEditingController(text: '1');
+  DateTime expiry = DateTime.now().add(const Duration(days: 30));
+  String category = 'عام';
+
+  @override
+  Widget build(BuildContext context) => Directionality(
+    textDirection: TextDirection.rtl,
+    child: Scaffold(
+      appBar: AppBar(title: const Text('إضافة مادة')),
+      body: ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          TextField(controller: name, decoration: const InputDecoration(labelText: 'اسم المادة')),
+          const SizedBox(height: 12),
+          TextField(controller: barcode, decoration: const InputDecoration(labelText: 'الباركود')),
+          const SizedBox(height: 12),
+          TextField(controller: qty, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'الكمية')),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: category,
+            items: const ['عام', 'غذائي', 'دوائي', 'مواد خام', 'أخرى']
+                .map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            onChanged: (v) => setState(() => category = v ?? 'عام'),
+            decoration: const InputDecoration(labelText: 'التصنيف'),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('تاريخ الانتهاء'),
+            subtitle: Text(expiry.day.toString() + '/' + expiry.month.toString() + '/' + expiry.year.toString()),
+            onTap: () async {
+              final d = await showDatePicker(
+                context: context, initialDate: expiry,
+                firstDate: DateTime.now(), lastDate: DateTime(2100),
+              );
+              if (d != null && mounted) setState(() => expiry = d);
+            },
+          ),
+          const SizedBox(height: 20),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, Product(
+              id: DateTime.now().microsecondsSinceEpoch.toString(),
+              name: name.text.trim().isEmpty ? 'مادة جديدة' : name.text.trim(),
+              barcode: barcode.text.trim(), expiry: expiry,
+              quantity: int.tryParse(qty.text) ?? 1, category: category,
+            )),
+            child: const Text('حفظ المادة'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class Alerts extends StatelessWidget{final List<Product> items;const Alerts({super.key,required this.items});
@@ -158,16 +226,52 @@ class _GateState extends State<Gate>{final x=TextEditingController();
 @override Widget build(BuildContext c)=>AlertDialog(title:const Text('دخول الإدارة'),content:TextField(controller:x,obscureText:true,keyboardType:TextInputType.number,decoration:const InputDecoration(labelText:'رمز الإدارة')),
 actions:[TextButton(onPressed:()=>Navigator.pop(c),child:const Text('إلغاء')),FilledButton(onPressed:()=>Navigator.pop(c,x.text),child:const Text('دخول'))]);}
 
-class Admin extends StatefulWidget{const Admin({super.key});@override State<Admin> createState()=>_AdminState();}
-class _AdminState extends State<Admin>{final code=TextEditingController();String plan='6_months',status='جاهز للربط بالخادم';
-@override Widget build(BuildContext c)=>Directionality(textDirection:TextDirection.rtl,child:Scaffold(appBar:AppBar(title:const Text('ADREEMK • الإدارة')),
-body:ListView(padding:const EdgeInsets.all(18),children:[
-const Text('إدارة التراخيص',style:TextStyle(fontSize:28,fontWeight:FontWeight.w900)),const SizedBox(height:8),
-const Text('الإدارة النهائية للتراخيص ستكون عبر Cloudflare Worker + D1.'),
-const SizedBox(height:20),DropdownButtonFormField<String>(value:plan,items:const[
-DropdownMenuItem(value:'6_months',child:Text('6 أشهر')),DropdownMenuItem(value:'year',child:Text('سنة')),DropdownMenuItem(value:'permanent',child:Text('دائم'))],
-onChanged:(v)=>setState(()=>plan=v??'6_months'),decoration:const InputDecoration(labelText:'نوع الترخيص')),
-const SizedBox(height:12),TextField(controller:code,decoration:const InputDecoration(labelText:'كود التفعيل')),
-const SizedBox(height:12),FilledButton(onPressed:()=>setState(()=>status=code.text.trim().isEmpty?'أدخل كود التفعيل':'تم حفظ الكود محليًا — بانتظار ربط الخادم'),child:const Text('حفظ')),
- const SizedBox(height:12),FilledButton(onPressed:()=>setState(()=>status=code.text.trim().isEmpty?'أدخل كود التفعيل':'تم حفظ الكود محليًا — بانتظار ربط الخادم'),child:const Text('حفظ')),
+class Admin extends StatefulWidget {
+  const Admin({super.key});
+  @override State<Admin> createState() => _AdminState();
+}
+class _AdminState extends State<Admin> {
+  final code = TextEditingController();
+  String plan = '6_months';
+  String status = 'جاهز للربط بالخادم';
+
+  @override
+  Widget build(BuildContext context) => Directionality(
+    textDirection: TextDirection.rtl,
+    child: Scaffold(
+      appBar: AppBar(title: const Text('ADREEMK • الإدارة')),
+      body: ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          const Text('إدارة التراخيص', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 8),
+          const Text('الإدارة النهائية للتراخيص ستكون عبر Cloudflare Worker + D1.'),
+          const SizedBox(height: 20),
+          DropdownButtonFormField<String>(
+            initialValue: plan,
+            items: const [
+              DropdownMenuItem(value: '6_months', child: Text('6 أشهر')),
+              DropdownMenuItem(value: 'year', child: Text('سنة')),
+              DropdownMenuItem(value: 'permanent', child: Text('دائم')),
+            ],
+            onChanged: (v) => setState(() => plan = v ?? '6_months'),
+            decoration: const InputDecoration(labelText: 'نوع الترخيص'),
+          ),
+          const SizedBox(height: 12),
+          TextField(controller: code, decoration: const InputDecoration(labelText: 'كود التفعيل')),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () => setState(() {
+              status = code.text.trim().isEmpty
+                  ? 'أدخل كود التفعيل'
+                  : 'تم حفظ الكود محليًا — بانتظار ربط الخادم';
+            }),
+            child: const Text('حفظ'),
+          ),
+          const SizedBox(height: 12),
+          Text(status),
+        ],
+      ),
+    ),
+  );
 }
