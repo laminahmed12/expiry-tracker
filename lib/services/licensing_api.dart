@@ -9,16 +9,57 @@ class LicensingApi {
   Uri _uri(String path) => Uri.parse(baseUrl.replaceAll(RegExp(r'/+$'), '') + path);
 
   Future<Map<String, dynamic>> activate({required String code, required String deviceId}) async {
-    final response = await http.post(_uri('/v1/activate'), headers: const {'content-type': 'application/json'}, body: jsonEncode({'code': code, 'deviceId': deviceId})).timeout(const Duration(seconds: 15));
+    final response = await http.post(
+      _uri('/v1/activate'),
+      headers: const {'content-type': 'application/json'},
+      body: jsonEncode({'code': code, 'deviceId': deviceId}),
+    ).timeout(const Duration(seconds: 15));
     final data = jsonDecode(response.body) as Map<String, dynamic>;
-    if (response.statusCode < 200 || response.statusCode >= 300 || data['ok'] != true) throw LicensingException(_messageFor(data['error']?.toString()), statusCode: response.statusCode);
+    if (response.statusCode < 200 || response.statusCode >= 300 || data['ok'] != true) {
+      throw LicensingException(_messageFor(data['error']?.toString()), statusCode: response.statusCode);
+    }
     return data;
   }
 
   Future<Map<String, dynamic>> checkLicense(String deviceId) async {
-    final response = await http.get(_uri('/v1/license/${Uri.encodeComponent(deviceId)}')).timeout(const Duration(seconds: 15));
+    final response = await http.get(
+      _uri('/v1/license/${Uri.encodeComponent(deviceId)}'),
+    ).timeout(const Duration(seconds: 15));
     final data = jsonDecode(response.body) as Map<String, dynamic>;
-    if (response.statusCode < 200 || response.statusCode >= 300 || data['ok'] != true) throw LicensingException(_messageFor(data['error']?.toString()), statusCode: response.statusCode);
+    if (response.statusCode < 200 || response.statusCode >= 300 || data['ok'] != true) {
+      throw LicensingException(_messageFor(data['error']?.toString()), statusCode: response.statusCode);
+    }
+    return data;
+  }
+
+  Future<Map<String, dynamic>> createLicense({
+    required String adminApiKey,
+    required String customerName,
+    required String plan,
+  }) async {
+    final key = adminApiKey.trim();
+    final response = await http.post(
+      _uri('/v1/admin/licenses'),
+      headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $key',
+      },
+      body: jsonEncode({
+        'customerName': customerName.trim().isEmpty ? 'عميل' : customerName.trim(),
+        'plan': plan,
+      }),
+    ).timeout(const Duration(seconds: 15));
+
+    Map<String, dynamic> data;
+    try {
+      data = jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (_) {
+      throw const LicensingException('استجابة غير مفهومة من الخادم.', statusCode: 500);
+    }
+
+    if (response.statusCode < 200 || response.statusCode >= 300 || data['ok'] != true) {
+      throw LicensingException(_adminMessageFor(data['error']?.toString()), statusCode: response.statusCode);
+    }
     return data;
   }
 
@@ -31,10 +72,19 @@ class LicensingApi {
       default: return 'تعذر الاتصال بخادم الترخيص.';
     }
   }
+
+  String _adminMessageFor(String? error) {
+    switch (error) {
+      case 'unauthorized': return 'مفتاح الإدارة غير صحيح.';
+      case 'invalid_plan': return 'نوع الترخيص غير صحيح.';
+      default: return 'تعذر إنشاء الترخيص. تحقق من الاتصال بالخادم.';
+    }
+  }
 }
 
 class LicensingException implements Exception {
-  final String message; final int statusCode;
+  final String message;
+  final int statusCode;
   const LicensingException(this.message, {required this.statusCode});
   @override String toString() => message;
 }
