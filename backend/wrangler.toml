@@ -1,8 +1,8 @@
-name = "adreemk-licensing"
+name = "expiry-tracker"
 main = "src/worker.js"
 compatibility_date = "2026-09-26"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "adreemk-licensing"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "db1b3b1a-5e8d-4331-9359-1aeb4874ec3e"
