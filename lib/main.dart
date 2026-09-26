@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'screens/license_gate.dart';
+import 'services/licensing_api.dart';
 
 void main() => runApp(const AdreemkApp());
 
