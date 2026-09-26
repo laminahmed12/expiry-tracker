@@ -20,6 +20,9 @@ jobs:
       - name: Flutter version
         run: flutter --version
 
+      - name: Generate Flutter platform folders
+        run: flutter create --project-name adreemk_expiry .
+
       - name: Get dependencies
         run: flutter pub get
 
