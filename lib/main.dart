@@ -95,25 +95,51 @@ class _HomeState extends State<Home> {
   }
 }
 
-class Dashboard extends StatelessWidget{
-  final List<Product> items; final VoidCallback onAdmin;
-  const Dashboard({super.key,required this.items,required this.onAdmin});
-  @override Widget build(BuildContext c){
-    final near=items.where((p){final d=p.expiry.difference(DateTime.now()).inDays;return d>=0&&d<=30;}).length;
-    final expired=items.where((p)=>p.expiry.isBefore(DateTime.now())).length;
-    return ListView(padding:const EdgeInsets.all(18),children:[
-      const Text('لوحة التحكم',style:TextStyle(fontSize:28,fontWeight:FontWeight.w900)),
-      const SizedBox(height:6),const Text('إدارة المواد وتواريخ الصلاحية بطريقة بسيطة.'),
-      const SizedBox(height:20),Wrap(spacing:10,runSpacing:10,children:[
-        Stat('إجمالي المواد',items.length,Icons.inventory_2),
-        Stat('قريبة الانتهاء',near,Icons.schedule),
-        Stat('منتهية',expired,Icons.warning_amber_rounded)]),
-      const SizedBox(height:20),Card(elevation:0,child:ListTile(
-        leading:const Icon(Icons.verified_user_outlined),title:const Text('ADREEMK'),
-        subtitle:const Text('تشغيل محلي + نظام ترخيص قابل للربط بالخادم.'),
-        NavigationDestination(icon:Icon(Icons.settings_outlined),selectedIcon:Icon(Icons.settings),label:'الإعدادات'),
+class Dashboard extends StatelessWidget {
+  final List<Product> items;
+  final VoidCallback onAdmin;
+  const Dashboard({super.key, required this.items, required this.onAdmin});
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final near = items.where((p) {
+      final d = p.expiry.difference(now).inDays;
+      return d >= 0 && d <= 30;
+    }).length;
+    final expired = items.where((p) => p.expiry.isBefore(now)).length;
+
+    return ListView(
+      padding: const EdgeInsets.all(18),
+      children: [
+        const Text('لوحة التحكم', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 6),
+        const Text('إدارة المواد وتواريخ الصلاحية بطريقة بسيطة.'),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            Stat('إجمالي المواد', items.length, Icons.inventory_2),
+            Stat('قريبة الانتهاء', near, Icons.schedule),
+            Stat('منتهية', expired, Icons.warning_amber_rounded),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Card(
+          elevation: 0,
+          child: ListTile(
+            leading: const Icon(Icons.verified_user_outlined),
+            title: const Text('ADREEMK'),
+            subtitle: const Text('تشغيل محلي + نظام ترخيص قابل للربط بالخادم.'),
+            trailing: IconButton(onPressed: onAdmin, icon: const Icon(Icons.more_horiz)),
+          ),
+        ),
+      ],
+    );
   }
 }
+
 class Stat extends StatelessWidget{final String title;final int value;final IconData icon;const Stat(this.title,this.value,this.icon,{super.key});
 @override Widget build(BuildContext c)=>SizedBox(width:170,child:Card(elevation:0,child:Padding(padding:const EdgeInsets.all(16),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
 Icon(icon),const SizedBox(height:10),Text(value.toString(),style:const TextStyle(fontSize:28,fontWeight:FontWeight.w900)),Text(title)]))));}
