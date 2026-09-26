@@ -256,10 +256,61 @@ class Admin extends StatefulWidget {
   const Admin({super.key});
   @override State<Admin> createState() => _AdminState();
 }
+
 class _AdminState extends State<Admin> {
-  final code = TextEditingController();
+  final customer = TextEditingController(text: 'تجربة حمادي');
+  final adminKey = TextEditingController();
   String plan = '6_months';
-  String status = 'جاهز للربط بالخادم';
+  bool loading = false;
+  String? status;
+  bool success = false;
+
+  String planLabel(String value) {
+    switch (value) {
+      case '6_months': return '6 أشهر';
+      case '1_year': return 'سنة';
+      default: return 'دائم';
+    }
+  }
+
+  Future<void> createLicense() async {
+    if (adminKey.text.trim().isEmpty) {
+      setState(() { success = false; status = 'أدخل مفتاح الإدارة أولًا.'; });
+      return;
+    }
+    setState(() { loading = true; success = false; status = null; });
+
+    try {
+      final result = await LicensingApi().createLicense(
+        adminApiKey: adminKey.text,
+        customerName: customer.text,
+        plan: plan,
+      );
+      if (!mounted) return;
+      final code = result['code']?.toString() ?? '';
+      final expires = result['expiresAt']?.toString();
+      setState(() {
+        success = true;
+        status = expires == null
+            ? 'تم إنشاء ترخيص دائم.\\nالكود: $code'
+            : 'تم إنشاء ترخيص ${planLabel(plan)}.\\nالكود: $code\\nينتهي: $expires';
+      });
+      adminKey.clear();
+    } on LicensingException catch (e) {
+      if (mounted) setState(() { success = false; status = e.message; });
+    } catch (_) {
+      if (mounted) setState(() { success = false; status = 'تعذر الاتصال بخادم الترخيص.'; });
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    customer.dispose();
+    adminKey.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => Directionality(
@@ -271,31 +322,75 @@ class _AdminState extends State<Admin> {
         children: [
           const Text('إدارة التراخيص', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
-          const Text('الإدارة النهائية للتراخيص ستكون عبر Cloudflare Worker + D1.'),
+          const Text('أنشئ ترخيصًا للعميل مباشرة من الهاتف. مفتاح الإدارة لا يتم حفظه على الجهاز.'),
           const SizedBox(height: 20),
+          TextField(
+            controller: customer,
+            decoration: const InputDecoration(
+              labelText: 'اسم العميل',
+              prefixIcon: Icon(Icons.person_outline),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 14),
           DropdownButtonFormField<String>(
             initialValue: plan,
             items: const [
               DropdownMenuItem(value: '6_months', child: Text('6 أشهر')),
-              DropdownMenuItem(value: 'year', child: Text('سنة')),
+              DropdownMenuItem(value: '1_year', child: Text('سنة')),
               DropdownMenuItem(value: 'permanent', child: Text('دائم')),
             ],
-            onChanged: (v) => setState(() => plan = v ?? '6_months'),
-            decoration: const InputDecoration(labelText: 'نوع الترخيص'),
+            onChanged: loading ? null : (v) => setState(() => plan = v ?? '6_months'),
+            decoration: const InputDecoration(
+              labelText: 'نوع الترخيص',
+              prefixIcon: Icon(Icons.card_membership_outlined),
+              border: OutlineInputBorder(),
+            ),
           ),
-          const SizedBox(height: 12),
-          TextField(controller: code, decoration: const InputDecoration(labelText: 'كود التفعيل')),
-          const SizedBox(height: 12),
-          FilledButton(
-            onPressed: () => setState(() {
-              status = code.text.trim().isEmpty
-                  ? 'أدخل كود التفعيل'
-                  : 'تم حفظ الكود محليًا — بانتظار ربط الخادم';
-            }),
-            child: const Text('حفظ'),
+          const SizedBox(height: 14),
+          TextField(
+            controller: adminKey,
+            obscureText: true,
+            autocorrect: false,
+            enableSuggestions: false,
+            decoration: const InputDecoration(
+              labelText: 'مفتاح الإدارة',
+              helperText: 'يُستخدم للطلب الحالي فقط ولا يتم حفظه.',
+              prefixIcon: Icon(Icons.lock_outline),
+              border: OutlineInputBorder(),
+            ),
           ),
-          const SizedBox(height: 12),
-          Text(status),
+          const SizedBox(height: 18),
+          FilledButton.icon(
+            onPressed: loading ? null : createLicense,
+            icon: loading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.add_moderator_outlined),
+            label: Text(loading ? 'جاري الإنشاء...' : 'إنشاء ترخيص'),
+          ),
+          if (status != null) ...[
+            const SizedBox(height: 18),
+            Card(
+              elevation: 0,
+              color: success ? const Color(0xffe7f4ec) : const Color(0xffffeeee),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: SelectableText(
+                  status!,
+                  style: const TextStyle(fontWeight: FontWeight.w700, height: 1.6),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 18),
+          const Card(
+            elevation: 0,
+            child: ListTile(
+              leading: Icon(Icons.security_outlined),
+              title: Text('تنبيه أمني'),
+              subtitle: Text('لا تضع مفتاح الإدارة داخل كود التطبيق أو ترسله للعميل.'),
+            ),
+          ),
         ],
       ),
     ),
