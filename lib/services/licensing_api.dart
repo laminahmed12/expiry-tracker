@@ -65,7 +65,7 @@ class LicensingApi {
 
   String _messageFor(String? error) {
     switch (error) {
-      case 'invalid_license': return 'كود التفعيل غير صحيح.';
+      case 'invalid_license': return 'كود تفعيل العميل غير صحيح. استخدم الكود الذي أنشأه الخادم مثل AD6-...';
       case 'device_mismatch': return 'هذا الترخيص مرتبط بجهاز آخر.';
       case 'license_expired': return 'انتهت صلاحية الترخيص.';
       case 'license_not_found': return 'لا يوجد ترخيص لهذا الجهاز.';
@@ -75,9 +75,9 @@ class LicensingApi {
 
   String _adminMessageFor(String? error) {
     switch (error) {
-      case 'unauthorized': return 'مفتاح الإدارة غير صحيح.';
+      case 'unauthorized': return 'مفتاح الإدارة غير صحيح. الرمز 116936 يفتح لوحة الإدارة فقط، وليس كود إنشاء الترخيص.';
       case 'invalid_plan': return 'نوع الترخيص غير صحيح.';
-      default: return 'تعذر إنشاء الترخيص. تحقق من الاتصال بالخادم.';
+      default: return 'تعذر إنشاء الترخيص من الخادم. تحقق من مفتاح الإدارة والإنترنت.';
     }
   }
 }
