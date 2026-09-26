@@ -87,7 +87,7 @@ class Dashboard extends StatelessWidget{
       const SizedBox(height:20),Card(elevation:0,child:ListTile(
         leading:const Icon(Icons.verified_user_outlined),title:const Text('ADREEMK'),
         subtitle:const Text('تشغيل محلي + نظام ترخيص قابل للربط بالخادم.'),
-        trailing:IconButton(onPressed:onAdmin,icon:const Icon(Icons.more_horiz))))]);
+        trailing:IconButton(onPressed:onAdmin,icon:const Icon(Icons.more_horiz))));]);
   }
 }
 class Stat extends StatelessWidget{final String title;final int value;final IconData icon;const Stat(this.title,this.value,this.icon,{super.key});
