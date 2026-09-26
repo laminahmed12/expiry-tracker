@@ -167,6 +167,6 @@ const SizedBox(height:20),DropdownButtonFormField<String>(value:plan,items:const
 DropdownMenuItem(value:'6_months',child:Text('6 أشهر')),DropdownMenuItem(value:'year',child:Text('سنة')),DropdownMenuItem(value:'permanent',child:Text('دائم'))],
 onChanged:(v)=>setState(()=>plan=v??'6_months'),decoration:const InputDecoration(labelText:'نوع الترخيص')),
 const SizedBox(height:12),TextField(controller:code,decoration:const InputDecoration(labelText:'كود التفعيل')),
-const SizedBox(height:12),FilledButton(onPressed:()=>setState(()=>status=code.text.trim().isEmpty?'أدخل كود التفعيل':'تم حفظ الكود محليًا — بانتظار ربط الخادم')),child:const Text('حفظ')),
+const SizedBox(height:12),FilledButton(onPressed:()=>setState(()=>status=code.text.trim().isEmpty?'أدخل كود التفعيل':'تم حفظ الكود محليًا — بانتظار ربط الخادم'),child:const Text('حفظ')),
 const SizedBox(height:12),Text(status)]));}
 }
