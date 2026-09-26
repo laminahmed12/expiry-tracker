@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'screens/license_gate.dart';
 
 void main() => runApp(const AdreemkApp());
 
@@ -35,7 +36,7 @@ class AdreemkApp extends StatelessWidget {
     debugShowCheckedModeBanner:false,title:'ADREEMK | صلاحيات المواد',
     theme:ThemeData(useMaterial3:true,fontFamily:'sans',scaffoldBackgroundColor:const Color(0xfff7f8f6),
       colorScheme:ColorScheme.fromSeed(seedColor:const Color(0xff174d3a))),
-    home:const Home());
+    home:const LicenseGate(child: Home()));
 }
 
 class Home extends StatefulWidget { const Home({super.key}); @override State<Home> createState()=>_HomeState(); }
