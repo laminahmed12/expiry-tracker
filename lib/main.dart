@@ -67,7 +67,7 @@ class _HomeState extends State<Home> {
         NavigationDestination(icon:Icon(Icons.dashboard_outlined),selectedIcon:Icon(Icons.dashboard),label:'الرئيسية'),
         NavigationDestination(icon:Icon(Icons.inventory_2_outlined),selectedIcon:Icon(Icons.inventory_2),label:'المواد'),
         NavigationDestination(icon:Icon(Icons.notifications_none),selectedIcon:Icon(Icons.notifications),label:'التنبيهات'),
-        NavigationDestination(icon:Icon(Icons.settings_outlined),selectedIcon:Icon(Icons.settings),label:'الإعدادات')]));
+      trailing:IconButton(onPressed:onAdmin,icon:const Icon(Icons.more_horiz)))),
   }
 }
 
@@ -87,7 +87,7 @@ class Dashboard extends StatelessWidget{
       const SizedBox(height:20),Card(elevation:0,child:ListTile(
         leading:const Icon(Icons.verified_user_outlined),title:const Text('ADREEMK'),
         subtitle:const Text('تشغيل محلي + نظام ترخيص قابل للربط بالخادم.'),
-        trailing:IconButton(onPressed:onAdmin,icon:const Icon(Icons.more_horiz))));]);
+        NavigationDestination(icon:Icon(Icons.settings_outlined),selectedIcon:Icon(Icons.settings),label:'الإعدادات'),
   }
 }
 class Stat extends StatelessWidget{final String title;final int value;final IconData icon;const Stat(this.title,this.value,this.icon,{super.key});
@@ -131,7 +131,7 @@ class _AddProductState extends State<AddProduct>{
  ListTile(contentPadding:EdgeInsets.zero,title:const Text('تاريخ الانتهاء'),subtitle:Text('اضغط لاختيار التاريخ'),onTap:()async{
   final d=await showDatePicker(context:c,initialDate:expiry,firstDate:DateTime.now(),lastDate:DateTime(2100));if(d!=null)setState(()=>expiry=d);}),
  const SizedBox(height:20),FilledButton(onPressed:()=>Navigator.pop(c,Product(id:DateTime.now().microsecondsSinceEpoch.toString(),name:name.text.trim(),barcode:barcode.text.trim(),expiry:expiry,quantity:int.tryParse(qty.text)??1,category:category)),child:const Text('حفظ المادة'))
- ]));
+ ]);}
 }
 
 class Alerts extends StatelessWidget{final List<Product> items;const Alerts({super.key,required this.items});
@@ -169,5 +169,5 @@ DropdownMenuItem(value:'6_months',child:Text('6 أشهر')),DropdownMenuItem(val
 onChanged:(v)=>setState(()=>plan=v??'6_months'),decoration:const InputDecoration(labelText:'نوع الترخيص')),
 const SizedBox(height:12),TextField(controller:code,decoration:const InputDecoration(labelText:'كود التفعيل')),
 const SizedBox(height:12),FilledButton(onPressed:()=>setState(()=>status=code.text.trim().isEmpty?'أدخل كود التفعيل':'تم حفظ الكود محليًا — بانتظار ربط الخادم'),child:const Text('حفظ')),
-const SizedBox(height:12),Text(status)]));}
+ const SizedBox(height:12),FilledButton(onPressed:()=>setState(()=>status=code.text.trim().isEmpty?'أدخل كود التفعيل':'تم حفظ الكود محليًا — بانتظار ربط الخادم'),child:const Text('حفظ')),
 }
