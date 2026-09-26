@@ -73,22 +73,50 @@ class _LicenseGateState extends State<LicenseGate> {
 
 class ExpiredScreen extends StatelessWidget {
   final VoidCallback onActivated;
+
   const ExpiredScreen({super.key, required this.onActivated});
-  @override Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(child: Center(child: Padding(
-      padding: const EdgeInsets.all(28),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Icon(Icons.lock_clock_outlined, size: 72),
-        const SizedBox(height: 20),
-        const Text('انتهت الفترة التجريبية', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
-        const SizedBox(height: 10),
-        const Text('بياناتك محفوظة على الجهاز. فعّل التطبيق للعودة إلى الاستخدام الكامل.', textAlign: TextAlign.center),
-        const SizedBox(height: 28),
-        FilledButton.icon(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ActivationScreen(onActivated: onActivated))),
-          icon: const Icon(Icons.key_outlined), label: const Text('تفعيل التطبيق'),
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock_clock_outlined, size: 72),
+                const SizedBox(height: 20),
+                const Text(
+                  'انتهت الفترة التجريبية',
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'بياناتك محفوظة على الجهاز. فعّل التطبيق للعودة إلى الاستخدام الكامل.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                FilledButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ActivationScreen(
+                          onActivated: onActivated,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.key_outlined),
+                  label: const Text('تفعيل التطبيق'),
+                ),
+              ],
+            ),
+          ),
         ),
-      ]),
-    )),
-  );
+      ),
+    );
+  }
 }
