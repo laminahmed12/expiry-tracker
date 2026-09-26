@@ -293,8 +293,8 @@ class _AdminState extends State<Admin> {
       setState(() {
         success = true;
         status = expires == null
-            ? 'تم إنشاء ترخيص دائم.\\nالكود: $code'
-            : 'تم إنشاء ترخيص ${planLabel(plan)}.\\nالكود: $code\\nينتهي: $expires';
+            ? 'تم إنشاء ترخيص دائم.\\nكود العميل: $code'
+            : 'تم إنشاء ترخيص ${planLabel(plan)}.\\nكود العميل: $code\\nينتهي: $expires';
       });
       adminKey.clear();
     } on LicensingException catch (e) {
@@ -323,7 +323,7 @@ class _AdminState extends State<Admin> {
         children: [
           const Text('إدارة التراخيص', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
-          const Text('أنشئ ترخيصًا للعميل مباشرة من الهاتف. مفتاح الإدارة لا يتم حفظه على الجهاز.'),
+          const Text('أنشئ كود تفعيل للعميل من الهاتف.\n\nمهم: 116936 هو رمز دخول لوحة الإدارة فقط، وليس كود تفعيل العميل. كود العميل يتم إنشاؤه من الخادم.'),
           const SizedBox(height: 20),
           TextField(
             controller: customer,
@@ -356,7 +356,7 @@ class _AdminState extends State<Admin> {
             enableSuggestions: false,
             decoration: const InputDecoration(
               labelText: 'مفتاح الإدارة',
-              helperText: 'يُستخدم للطلب الحالي فقط ولا يتم حفظه.',
+              helperText: 'هذا هو مفتاح الإدارة السري الموجود في Cloudflare، وليس 116936.',
               prefixIcon: Icon(Icons.lock_outline),
               border: OutlineInputBorder(),
             ),
