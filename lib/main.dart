@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
   Future<void> remove(Product p)async{setState(()=>items.removeWhere((x)=>x.id==p.id));await Store.save(items);}
   void adminTap()async{taps++;if(taps<3)return;taps=0;
     final v=await showDialog(context:context,builder:(_)=>const Gate());
-    if(v=='116936'&&mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>Admin(ownerPin:v)));
+    if(v=='116936'&&mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>Admin(v)));
   }
   @override Widget build(BuildContext context){
     if(loading)return const Scaffold(body:Center(child:CircularProgressIndicator()));
@@ -261,8 +261,8 @@ class _GateState extends State<Gate>{final x=TextEditingController();
 actions:[TextButton(onPressed:()=>Navigator.pop(c),child:const Text('إلغاء')),FilledButton(onPressed:()=>Navigator.pop(c,x.text),child:const Text('دخول'))]);}
 
 class Admin extends StatefulWidget {
-  final String ownerCredential;
-  const Admin({super.key, required this.ownerCredential});
+  final String? ownerCredential;
+  const Admin(this.ownerCredential,{super.key});
   @override State<Admin> createState() => _AdminState();
 }
 
@@ -286,7 +286,7 @@ class _AdminState extends State<Admin> {
 
     try {
       final result = await LicensingApi().createLicense(
-        adminApiKey: widget.ownerCredential,
+        adminApiKey: widget.ownerCredential ?? '',
         customerName: customer.text,
         plan: plan,
       );
