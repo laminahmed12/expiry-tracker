@@ -197,7 +197,30 @@ class _AddProductState extends State<AddProduct> {
         children: [
           TextField(controller: name, decoration: const InputDecoration(labelText: 'اسم المادة')),
           const SizedBox(height: 12),
-          TextField(controller: barcode, decoration: const InputDecoration(labelText: 'الباركود')),
+          TextField(
+            controller: barcode,
+            decoration: InputDecoration(
+              labelText: 'الباركود',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.qr_code_2),
+              suffixIcon: IconButton(
+                tooltip: 'قراءة الباركود بالكاميرا',
+                icon: const Icon(Icons.camera_alt_outlined),
+                onPressed: () async {
+                  final value = await Navigator.push<String>(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Scanner()),
+                  );
+                  if (value != null && value.isNotEmpty && mounted) {
+                    barcode.text = value;
+                    barcode.selection = TextSelection.fromPosition(
+                      TextPosition(offset: barcode.text.length),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
           const SizedBox(height: 12),
           TextField(controller: qty, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'الكمية')),
           const SizedBox(height: 12),
@@ -250,9 +273,88 @@ ListTile(leading:Icon(Icons.backup_outlined),title:Text('النسخ الاحتي
 Divider(height:1),ListTile(leading:Icon(Icons.verified_outlined),title:Text('الترخيص'),subtitle:Text('7 أيام تجربة • 6 أشهر • سنة • دائم')),
 Divider(height:1),ListTile(leading:Icon(Icons.help_outline),title:Text('المساعدة'),subtitle:Text('دليل الاستخدام والدعم.'))]))]);}
 
-class Scanner extends StatelessWidget{const Scanner({super.key});
-@override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('مسح الباركود')),
-body:MobileScanner(onDetect:(capture){final b=capture.barcodes.isEmpty?null:capture.barcodes.first.rawValue;if(b!=null&&b.isNotEmpty)Navigator.pop(c,b);}));
+class Scanner extends StatefulWidget {
+  const Scanner({super.key});
+  @override State<Scanner> createState() => _ScannerState();
+}
+
+class _ScannerState extends State<Scanner> {
+  final MobileScannerController controller = MobileScannerController();
+  bool found = false;
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('قراءة الباركود'),
+        actions: [
+          IconButton(
+            tooltip: 'تبديل الكاميرا',
+            icon: const Icon(Icons.flip_camera_android_outlined),
+            onPressed: () => controller.switchCamera(),
+          ),
+          IconButton(
+            tooltip: 'الفلاش',
+            icon: const Icon(Icons.flash_on_outlined),
+            onPressed: () => controller.toggleTorch(),
+          ),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          MobileScanner(
+            controller: controller,
+            onDetect: (capture) {
+              if (found) return;
+              for (final barcode in capture.barcodes) {
+                final value = barcode.rawValue;
+                if (value != null && value.trim().isNotEmpty) {
+                  found = true;
+                  controller.stop();
+                  Navigator.pop(context, value.trim());
+                  break;
+                }
+              }
+            },
+          ),
+          IgnorePointer(
+            child: Center(
+              child: Container(
+                width: 280,
+                height: 150,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: 2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+          const Positioned(
+            left: 24,
+            right: 24,
+            bottom: 40,
+            child: Text(
+              'وجّه الكاميرا نحو الباركود داخل الإطار',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                shadows: [Shadow(blurRadius: 4, offset: Offset(0, 1))],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class Gate extends StatefulWidget{const Gate({super.key});@override State<Gate> createState()=>_GateState();}
