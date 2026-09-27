@@ -75,9 +75,9 @@ class LicensingApi {
 
   String _adminMessageFor(String? error) {
     switch (error) {
-      case 'unauthorized': return 'تعذر التحقق من رمز المالك. تحقق من إعداد ترخيص الخادم.';
+      case 'unauthorized': return 'رمز المالك صحيح داخل التطبيق، لكن خادم الترخيص لم يُضبط بعد لقبوله.';
       case 'invalid_plan': return 'نوع الترخيص غير صحيح.';
-      default: return 'تعذر إنشاء الترخيص من الخادم. تحقق من مفتاح الإدارة والإنترنت.';
+      default: return 'تعذر إنشاء الترخيص من خادم الترخيص. تحقق من إعداد الخادم والإنترنت.';
     }
   }
 }
