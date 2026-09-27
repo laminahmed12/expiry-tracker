@@ -42,7 +42,7 @@ class LicensingApi {
       _uri('/v1/admin/licenses'),
       headers: {
         'content-type': 'application/json',
-        'authorization': 'Bearer $key',
+        'x-owner-pin': key,
       },
       body: jsonEncode({
         'customerName': customerName.trim().isEmpty ? 'عميل' : customerName.trim(),
@@ -75,7 +75,7 @@ class LicensingApi {
 
   String _adminMessageFor(String? error) {
     switch (error) {
-      case 'unauthorized': return 'مفتاح الإدارة غير صحيح. الرمز 116936 يفتح لوحة الإدارة فقط، وليس كود إنشاء الترخيص.';
+      case 'unauthorized': return 'تعذر التحقق من رمز المالك. تحقق من إعداد ترخيص الخادم.';
       case 'invalid_plan': return 'نوع الترخيص غير صحيح.';
       default: return 'تعذر إنشاء الترخيص من الخادم. تحقق من مفتاح الإدارة والإنترنت.';
     }
