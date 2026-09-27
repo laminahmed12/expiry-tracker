@@ -260,7 +260,6 @@ class Admin extends StatefulWidget {
 
 class _AdminState extends State<Admin> {
   final customer = TextEditingController(text: 'تجربة حمادي');
-  final adminKey = TextEditingController();
   String plan = '6_months';
   bool loading = false;
   String? status;
@@ -275,15 +274,10 @@ class _AdminState extends State<Admin> {
   }
 
   Future<void> createLicense() async {
-    if (adminKey.text.trim().isEmpty) {
-      setState(() { success = false; status = 'أدخل مفتاح الإدارة أولًا.'; });
-      return;
-    }
     setState(() { loading = true; success = false; status = null; });
 
     try {
       final result = await LicensingApi().createLicense(
-        adminApiKey: adminKey.text,
         customerName: customer.text,
         plan: plan,
       );
@@ -296,7 +290,6 @@ class _AdminState extends State<Admin> {
             ? 'تم إنشاء ترخيص دائم.\\nكود العميل: $code'
             : 'تم إنشاء ترخيص ${planLabel(plan)}.\\nكود العميل: $code\\nينتهي: $expires';
       });
-      adminKey.clear();
     } on LicensingException catch (e) {
       if (mounted) setState(() { success = false; status = e.message; });
     } catch (_) {
@@ -309,7 +302,6 @@ class _AdminState extends State<Admin> {
   @override
   void dispose() {
     customer.dispose();
-    adminKey.dispose();
     super.dispose();
   }
 
@@ -323,7 +315,7 @@ class _AdminState extends State<Admin> {
         children: [
           const Text('إدارة التراخيص', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
-          const Text('أنشئ كود تفعيل للعميل من الهاتف.\n\nمهم: 116936 هو رمز دخول لوحة الإدارة فقط، وليس كود تفعيل العميل. كود العميل يتم إنشاؤه من الخادم.'),
+          const Text('أنشئ كود تفعيل للعميل من الهاتف.\n\nرمز المالك الوحيد هو 116936. بعد الدخول لا تحتاج إلى أي مفتاح آخر.'),
           const SizedBox(height: 20),
           TextField(
             controller: customer,
@@ -349,19 +341,7 @@ class _AdminState extends State<Admin> {
             ),
           ),
           const SizedBox(height: 14),
-          TextField(
-            controller: adminKey,
-            obscureText: true,
-            autocorrect: false,
-            enableSuggestions: false,
-            decoration: const InputDecoration(
-              labelText: 'مفتاح الإدارة',
-              helperText: 'هذا هو مفتاح الإدارة السري الموجود في Cloudflare، وليس 116936.',
-              prefixIcon: Icon(Icons.lock_outline),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 4),
           FilledButton.icon(
             onPressed: loading ? null : createLicense,
             icon: loading
