@@ -23,6 +23,27 @@ jobs:
       - name: Generate Flutter platform folders
         run: flutter create --project-name adreemk_expiry .
 
+      - name: Apply owner licensing wiring
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("lib/main.dart")
+          s = p.read_text()
+          s = s.replace(
+              "if(v=='116936'&&mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>const Admin()));",
+              "if(v!=null&&mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>Admin(ownerPin:v)));"
+          )
+          s = s.replace(
+              "class Admin extends StatefulWidget {\n  const Admin({super.key});",
+              "class Admin extends StatefulWidget {\n  final String ownerPin;\n  const Admin({super.key, required this.ownerPin});"
+          )
+          s = s.replace(
+              "customerName: customer.text,\n        plan: plan,",
+              "adminApiKey: widget.ownerPin,\n        customerName: customer.text,\n        plan: plan,"
+          )
+          p.write_text(s)
+          PY
+
       - name: Get dependencies
         run: flutter pub get
 
