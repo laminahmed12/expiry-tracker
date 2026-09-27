@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
   Future<void> remove(Product p)async{setState(()=>items.removeWhere((x)=>x.id==p.id));await Store.save(items);}
   void adminTap()async{taps++;if(taps<3)return;taps=0;
     final v=await showDialog(context:context,builder:(_)=>const Gate());
-    if(v=='116936'&&mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>const Admin()));
+    if(v=='116936'&&mounted)Navigator.push(context,MaterialPageRoute(builder:(_)=>Admin(ownerPin:v)));
   }
   @override Widget build(BuildContext context){
     if(loading)return const Scaffold(body:Center(child:CircularProgressIndicator()));
@@ -129,11 +129,18 @@ class Dashboard extends StatelessWidget {
         const SizedBox(height: 20),
         Card(
           elevation: 0,
-          child: ListTile(
-            leading: const Icon(Icons.verified_user_outlined),
-            title: const Text('ADREEMK'),
-            subtitle: const Text('تشغيل محلي + نظام ترخيص قابل للربط بالخادم.'),
-            trailing: IconButton(onPressed: onAdmin, icon: const Icon(Icons.more_horiz)),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onAdmin,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+              child: Center(
+                child: Text(
+                  'ADREEMK',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
           ),
         ),
       ],
@@ -309,13 +316,13 @@ class _AdminState extends State<Admin> {
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
     child: Scaffold(
-      appBar: AppBar(title: const Text('ADREEMK • الإدارة')),
+      appBar: AppBar(title: const Text('الإدارة')),
       body: ListView(
         padding: const EdgeInsets.all(18),
         children: [
           const Text('إدارة التراخيص', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
-          const Text('أنشئ كود تفعيل للعميل من الهاتف.\n\nرمز المالك الوحيد هو 116936. بعد الدخول لا تحتاج إلى أي مفتاح آخر.'),
+          const Text('أنشئ كود تفعيل للعميل من الهاتف.'),
           const SizedBox(height: 20),
           TextField(
             controller: customer,
@@ -363,15 +370,7 @@ class _AdminState extends State<Admin> {
               ),
             ),
           ],
-          const SizedBox(height: 18),
-          const Card(
-            elevation: 0,
-            child: ListTile(
-              leading: Icon(Icons.security_outlined),
-              title: Text('تنبيه أمني'),
-              subtitle: Text('لا تضع مفتاح الإدارة داخل كود التطبيق أو ترسله للعميل.'),
-            ),
-          ),
+          
         ],
       ),
     ),
