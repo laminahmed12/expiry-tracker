@@ -261,7 +261,8 @@ class _GateState extends State<Gate>{final x=TextEditingController();
 actions:[TextButton(onPressed:()=>Navigator.pop(c),child:const Text('إلغاء')),FilledButton(onPressed:()=>Navigator.pop(c,x.text),child:const Text('دخول'))]);}
 
 class Admin extends StatefulWidget {
-  const Admin({super.key});
+  final String ownerCredential;
+  const Admin({super.key, required this.ownerCredential});
   @override State<Admin> createState() => _AdminState();
 }
 
@@ -285,6 +286,7 @@ class _AdminState extends State<Admin> {
 
     try {
       final result = await LicensingApi().createLicense(
+        adminApiKey: widget.ownerCredential,
         customerName: customer.text,
         plan: plan,
       );
