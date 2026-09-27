@@ -12,7 +12,11 @@ async function sha256(value) {
 
 function auth(request, env) {
   const header = request.headers.get("Authorization") || "";
-  return env.ADMIN_API_KEY && header === "Bearer " + env.ADMIN_API_KEY;
+  const ownerPin = request.headers.get("X-Owner-Pin") || "";
+  const configuredPin = env.OWNER_PIN || "";
+  const adminKeyOk = env.ADMIN_API_KEY && header === "Bearer " + env.ADMIN_API_KEY;
+  const ownerPinOk = configuredPin && ownerPin === configuredPin;
+  return Boolean(adminKeyOk || ownerPinOk);
 }
 
 function randomCode(prefix) {
