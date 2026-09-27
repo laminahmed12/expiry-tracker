@@ -49,7 +49,7 @@ class _LicenseGateState extends State<LicenseGate> {
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'التجربة: \${state!.daysLeft} أيام',
+                          'التجربة: ${state!.daysLeft} أيام',
                           maxLines: 1, softWrap: false,
                           style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800),
                         ),
