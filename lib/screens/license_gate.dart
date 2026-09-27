@@ -51,7 +51,7 @@ class _LicenseGateState extends State<LicenseGate> {
                         child: Text(
                           'التجربة: \${state!.daysLeft} أيام',
                           maxLines: 1, softWrap: false,
-                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800),
                         ),
                       ),
                     ),
